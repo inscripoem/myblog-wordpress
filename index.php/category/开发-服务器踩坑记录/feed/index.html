@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	
+	xmlns:georss="http://www.georss.org/georss"
+	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	>
+
+<channel>
+	<title>开发/服务器踩坑记录 &#8211; 极东观星总部</title>
+	<atom:link href="/myblog-wordpress/index.php/category/%e5%bc%80%e5%8f%91-%e6%9c%8d%e5%8a%a1%e5%99%a8%e8%b8%a9%e5%9d%91%e8%ae%b0%e5%bd%95/feed/" rel="self" type="application/rss+xml" />
+	<link>/myblog-wordpress/</link>
+	<description></description>
+	<lastBuildDate>Wed, 09 Mar 2022 15:32:09 +0000</lastBuildDate>
+	<language>zh-CN</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	
+
+<image>
+	<url>https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/01/cropped-天文望远镜-icon.png?fit=32%2C32&#038;ssl=1</url>
+	<title>开发/服务器踩坑记录 &#8211; 极东观星总部</title>
+	<link>/myblog-wordpress/</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+<site xmlns="com-wordpress:feed-additions:1">191050650</site>	<item>
+		<title>给你最爱的静态网站加上方便上传管理的git属性吧！</title>
+		<link>/myblog-wordpress/index.php/2022/03/09/%e7%bb%99%e4%bd%a0%e6%9c%80%e7%88%b1%e7%9a%84%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e5%8a%a0%e4%b8%8a%e6%96%b9%e4%be%bf%e4%b8%8a%e4%bc%a0%e7%ae%a1%e7%90%86%e7%9a%84git%e5%b1%9e%e6%80%a7%e5%90%a7/</link>
+					<comments>/myblog-wordpress/index.php/2022/03/09/%e7%bb%99%e4%bd%a0%e6%9c%80%e7%88%b1%e7%9a%84%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e5%8a%a0%e4%b8%8a%e6%96%b9%e4%be%bf%e4%b8%8a%e4%bc%a0%e7%ae%a1%e7%90%86%e7%9a%84git%e5%b1%9e%e6%80%a7%e5%90%a7/#respond</comments>
+		
+		<dc:creator><![CDATA[文诗就是本子]]></dc:creator>
+		<pubDate>Wed, 09 Mar 2022 15:32:09 +0000</pubDate>
+				<category><![CDATA[开发/服务器踩坑记录]]></category>
+		<guid isPermaLink="false">/myblog-wordpress/?p=106</guid>
+
+					<description><![CDATA[搞这个的前提是有一天我在编辑主页的时候忘记事先备份，然后之前调完的渐变就全丢了orz。这里要cue一下罪魁祸首 [&#8230;]]]></description>
+										<content:encoded><![CDATA[
+<p>搞这个的前提是有一天我在编辑<a rel="noreferrer noopener" href="https://www.inscripoem.com" data-type="URL" data-id="https://www.inscripoem.com" target="_blank">主页</a>的时候忘记事先备份，然后之前调完的渐变就全丢了orz。这里要cue一下罪魁祸首<a rel="noreferrer noopener" href="https://www.hoyoverse.com/zh-cn/about-us" data-type="URL" data-id="https://www.hoyoverse.com/zh-cn/about-us" target="_blank">HoYoverse的关于我们页面</a>，这个文字渐变实在太让人想抄了！（当然最后以没抄到动画代码还不得不猜一个之前用的渐变颜色的结果收场）</p>
+
+
+
+<p>正好之前看hexo本地部署的方法就是利用一个git用户创建仓库的形式来管理代码，把云端当成一个repo来部署，就想是不是可以把中间的一部分借鉴来完成静态网站的管理，这样我既有一个本地上传的渠道不用天天ssh，也可以方便退回到从前的版本。那么事不宜迟，我们马上开始。</p>
+
+
+
+<h2 class="wp-block-heading">1.添加git用户</h2>
+
+
+
+<p>安装git与nginx这一步我们就此跳过，从添加git用户开始</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>useradd git
+passwd git
+
+# 给git用户配置sudo权限
+chmod 740 /etc/sudoers
+vim /etc/sudoers
+# 找到root ALL=(ALL) ALL，在它下方加入一行
+git ALL=(ALL) ALL
+
+chmod 400 /etc/sudoers</code></pre></div>
+
+
+
+<h2 class="wp-block-heading">2.为git用户添加git密钥</h2>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>su - git
+mkdir -p ~/.ssh
+touch ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorzied_keys
+chmod 700 ~/.ssh
+vim ~/.ssh/authorized_keys    #将ssh密钥粘贴进去</code></pre></div>
+
+
+
+<p>这一步的ssh密钥可以参考<a rel="noreferrer noopener" href="https://www.jianshu.com/p/7aba9b127cb8" data-type="URL" data-id="https://www.jianshu.com/p/7aba9b127cb8" target="_blank">《生成SSH密钥》</a>来进行生成，总体上是运行<code>ssh-keygen -t rsa -C "your_email@example.com"</code>后，在对应用户的<code>.ssh</code>目录下生成的<code>id_rsa.pub</code>文件就是公钥，进行粘贴即可</p>
+
+
+
+<h2 class="wp-block-heading">3.创建git仓库并使用git-hooks进行自动部署</h2>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>sudo mkdir -p /home/git/repos    #新建目录，这是git仓库的位置
+sudo mkdir pp /www/wwwroot/homepage #homepage为你创建网站的位置
+cd /home/git/repos  #转到git仓库的文件夹
+sudo git init --bare homepage.git #创建一个名叫homepage的仓库
+sudo vim /home/git/repos/homepage.git/hooks/post-update</code></pre></div>
+
+
+
+<p>将<code>post-update</code>的内容改为如下：</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>#!/bin/bash
+git --work-tree=/www/wwwroot/homepage --git-dir=/home/git/repos/homepage.git checkout -f</code></pre></div>
+
+
+
+<p><strong>给post-update授权</strong>：</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>cd /home/git/repos/homepage.git/hooks/
+sudo chown -R git:git /home/git/repos/
+sudo chown -R git:git /www/wwwroot/homepage
+sudo chmod +x post-update  #赋予其可执行权限</code></pre></div>
+
+
+
+<p>下面一步是<strong>修改git用户的默认shell环境</strong>，但我本人没有进行这一步就完成了，所以暂且贴在这里，可以自行展开</p>
+
+
+
+<div class="wp-block-mdx-fold mdui-panel mdui-panel-gapless"><div class="mdui-panel-item"><div class="mdui-panel-item-header"><div class="mdui-panel-item-title">修改git用户的默认shell环境</div><i class="mdui-panel-item-arrow mdui-icon material-icons">keyboard_arrow_down</i></div><div class="mdui-panel-item-body"><p>
+vim /etc/passwd</br>
+#修改最后一行</br>
+#将/bin/bash修改为/usr/bin/git-shell
+</p></div></div></div>
+
+
+
+<h2 class="wp-block-heading">4.进行git仓库的拉取测试及初始化</h2>
+
+
+
+<p>接下来可以试着在本地电脑上（当然需要安装git）运行</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>git clone git@xxx.xx.xxx.xxx:/home/git/repos/homepage.git</code></pre></div>
+
+
+
+<p>如果成功，恭喜！这表明你前面的步骤没有出现错误，下面如果你试图开始往里面添加内容并推送，就会发现形如</p>
+
+
+
+<pre class="wp-block-code"><code>error: src refspec master does not match any.
+error: failed to push some refs to 'git@xxx.xx.xxx.xxx:/home/git/repos/homepage.git'</code></pre>
+
+
+
+<p>的错误，这是由于没有初始化git仓库造成的，因此需要在本地端运行</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>git add . #将文件添加到仓库
+git commit -m &quot;注释内容&quot; #进行提交
+git push -u origin master #将更改推送至远程仓库</code></pre></div>
+
+
+
+<p>后续即可正常提交</p>
+
+
+
+<p>锵锵！以后在本地端就可以直接把网站当成git仓库来改动及进行版本管理了</p>
+
+
+
+<p>注：由于本文章在撰写时笔者对于Git的理解并不深刻，所以在以上步骤运行后依然无法正常使用，或是关于代码之外的文件的问题，可以参阅文末的参考资料及网络等进行进一步探寻</p>
+
+
+
+<p><strong>参考文章：</strong></p>
+
+
+
+<p><a href="https://www.cnblogs.com/jie-fang/p/13445939.html" data-type="URL" data-id="https://www.cnblogs.com/jie-fang/p/13445939.html" target="_blank" rel="noreferrer noopener">将Hexo部署到自己的服务器上 | StaryJie</a></p>
+
+
+
+<p><a href="https://blog.csdn.net/qq_38198952/article/details/82792279" data-type="URL" data-id="https://blog.csdn.net/qq_38198952/article/details/82792279" target="_blank" rel="noreferrer noopener">error: src refspec master does not match any. 错误的解决办法 | oliverhoo</a></p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/myblog-wordpress/index.php/2022/03/09/%e7%bb%99%e4%bd%a0%e6%9c%80%e7%88%b1%e7%9a%84%e9%9d%99%e6%80%81%e7%bd%91%e7%ab%99%e5%8a%a0%e4%b8%8a%e6%96%b9%e4%be%bf%e4%b8%8a%e4%bc%a0%e7%ae%a1%e7%90%86%e7%9a%84git%e5%b1%9e%e6%80%a7%e5%90%a7/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">106</post-id>	</item>
+		<item>
+		<title>Hexo-Heroku部署记</title>
+		<link>/myblog-wordpress/index.php/2022/02/06/hexo-heroku%e9%83%a8%e7%bd%b2%e8%ae%b0/</link>
+					<comments>/myblog-wordpress/index.php/2022/02/06/hexo-heroku%e9%83%a8%e7%bd%b2%e8%ae%b0/#respond</comments>
+		
+		<dc:creator><![CDATA[文诗就是本子]]></dc:creator>
+		<pubDate>Sat, 05 Feb 2022 18:59:55 +0000</pubDate>
+				<category><![CDATA[开发/服务器踩坑记录]]></category>
+		<guid isPermaLink="false">/myblog-wordpress/?p=58</guid>
+
+					<description><![CDATA[这篇文章是在刚开始部署的时候创建的，现在一看实在是能踩的坑全部都踩过一遍了（ 心血来潮想在新注册的Heroku [&#8230;]]]></description>
+										<content:encoded><![CDATA[
+<p>这篇文章是在刚开始部署的时候创建的，现在一看实在是能踩的坑全部都踩过一遍了（</p>
+
+
+
+<p>心血来潮想在新注册的Heroku上部署点什么东西，那就是Hexo了，<s>其实是想给一起玩的朋友建一个发发疯的主页</s>。</p>
+
+
+
+<p>这次的部署过程主要基于<a rel="noreferrer noopener" href="https://hexo.io/zh-cn/docs/" data-type="URL" data-id="https://hexo.io/zh-cn/docs/" target="_blank">Hexo官方文档</a>以及<a rel="noreferrer noopener" href="https://blog.kennycoder.io/2019/08/04/Hexo-Heroku%E9%83%A8%E7%BD%B2%E6%95%99%E5%AD%B8/" data-type="URL" data-id="https://blog.kennycoder.io/2019/08/04/Hexo-Heroku%E9%83%A8%E7%BD%B2%E6%95%99%E5%AD%B8/" target="_blank">Hexo &#8211; Heroku 部署教學</a>，在windows平台上进行本地操作，由于之前安装过了Git和Node.js（之后发现单独的某个node版本还是有些局限，见后文），这部分的安装过程略过。</p>
+
+
+
+<p>首先根据教程安装Heroku CLI并创建app，这一步并没有太大问题。在运行<code>heroku login</code>时出现了第一个问题——国内不使用代理无法连接登录，会出现Invalid Request报错，但使用代理后又会出现IP不匹配的问题。在这一步完成之前是无法使用git推送到heroku上的，所幸在<a rel="noreferrer noopener" href="https://blog.csdn.net/qq_42951560/article/details/109717160" data-type="URL" data-id="https://blog.csdn.net/qq_42951560/article/details/109717160" target="_blank">解决 Heroku CLI 登录问题</a>中找到了方案，使用<code>heroku login -i</code>启用密码登录绕过网页登录。</p>
+
+
+
+<p>然后就是hexo和部署工具的安装，命令如下：</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>$ npm install -g hexo-cli
+$ hexo init &lt;folder&gt;
+$ cd &lt;folder&gt;
+$ npm install
+$ npm install hexo-deployer-heroku --save</code></pre></div>
+
+
+
+<p>这几步完成后，修改博客目录下的<code>_config.yml</code>，在deploy下添加如下配置：</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-yaml" data-lang="YAML"><code>deploy:
+  type: heroku
+  repo: &lt;repository url&gt;</code></pre></div>
+
+
+
+<p>并在url一栏中修改网址，接着理论上运行</p>
+
+
+
+<div class="hcb_wrap"><pre class="prism line-numbers lang-bash" data-lang="Bash"><code>$ hexo clean
+$ hexo g
+$ hexo d</code></pre></div>
+
+
+
+<p>就可以访问了，但由于是在heroku网页上创建的app，又是直接下载hexo的文件，这时候博客文件夹是没有git仓库的属性的，会报错</p>
+
+
+
+<pre class="wp-block-code"><code> fatal: Not a git repository (or any of the parent directories): .git </code></pre>
+
+
+
+<p>需要在目录下<code>git init</code>一下。</p>
+
+
+
+<p>在这之后的<code>hexo d</code>中，又出现了新的问题。</p>
+
+
+
+<pre class="wp-block-code"><code>FATAL Something's wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html
+TypeError &#91;ERR_INVALID_ARG_TYPE]: The "mode" argument must be integer. Received an instance of Object</code></pre>
+
+
+
+<p>最后在一个issue中找到了问题的原因是hexo不支持14以上版本的node<s>，现在大版本都16了你怎么毛病这么多</s>，于是试图下载13.9.0，索性用nvm做版本管理。</p>
+
+
+
+<p>在官网下载nvm后安装，记得安装到需要管理员权限的文件夹时（比如Program Files）要用管理员权限运行终端。在nvm安装目录的settings.txt中添加如下两条镜像。</p>
+
+
+
+<pre class="wp-block-code"><code>node_mirror: https://npm.taobao.org/mirrors/node/
+npm_mirror: https://npm.taobao.org/mirrors/npm/
+</code></pre>
+
+
+
+<p>然后<code>nvm install 13.9.0</code>，报错npm无法下载，按照网上方法全试了一遍之后发现</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><a href="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-2.png?ssl=1"><img fetchpriority="high" decoding="async" src="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-2.png?resize=640%2C439&#038;ssl=1" alt="" class="wp-image-70" width="640" height="439" srcset="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-2.png?resize=1024%2C703&amp;ssl=1 1024w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-2.png?resize=300%2C206&amp;ssl=1 300w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-2.png?resize=768%2C527&amp;ssl=1 768w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-2.png?w=1368&amp;ssl=1 1368w" sizes="(max-width: 640px) 100vw, 640px" data-recalc-dims="1" /></a></figure>
+
+
+
+<p>岂止是更新不及时，整个淘宝的npm镜像都寄了<s>，绝绝子</s></p>
+
+
+
+<figure class="wp-block-image size-full"><a href="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-3.png?ssl=1"><img decoding="async" width="341" height="144" src="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-3.png?resize=341%2C144&#038;ssl=1" alt="" class="wp-image-71" srcset="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-3.png?w=341&amp;ssl=1 341w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-3.png?resize=300%2C127&amp;ssl=1 300w" sizes="(max-width: 341px) 100vw, 341px" data-recalc-dims="1" /></a></figure>
+
+
+
+<p>遂删除npm镜像源，一次安装成功，在use 13.9.0时报错</p>
+
+
+
+<figure class="wp-block-image size-full is-resized"><a href="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image.png?ssl=1"><img decoding="async" src="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image.png?resize=400%2C89&#038;ssl=1" alt="" class="wp-image-60" width="400" height="89" srcset="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image.png?w=400&amp;ssl=1 400w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image.png?resize=300%2C67&amp;ssl=1 300w" sizes="(max-width: 400px) 100vw, 400px" data-recalc-dims="1" /></a></figure>
+
+
+
+<p>记得之前说的吗？使用管理员权限打开终端即可</p>
+
+
+
+<p>然后就是激动人心的重装npm包，<code>hexo clean</code>之后<code>hexo g</code>，<code>hexo d</code>，喜闻乐见的出了新错误</p>
+
+
+
+<pre class="wp-block-code"><code>npm ERR! missing script: start</code></pre>
+
+
+
+<p><s>之后发现重新删除app再创建一个就好了，应该是残留文件的问题</s></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?ssl=1"><img loading="lazy" decoding="async" width="1024" height="572" src="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?resize=1024%2C572&#038;ssl=1" alt="" class="wp-image-75" srcset="https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?resize=1024%2C572&amp;ssl=1 1024w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?resize=300%2C168&amp;ssl=1 300w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?resize=768%2C429&amp;ssl=1 768w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?resize=1536%2C858&amp;ssl=1 1536w, https://i0.wp.com/blog.inscripoem.com/wp-content/uploads/2022/02/image-5.png?w=1640&amp;ssl=1 1640w" sizes="(max-width: 1000px) 100vw, 1000px" data-recalc-dims="1" /></a></figure>
+
+
+
+<p>锵锵——再之后就是回归hexo本身的折腾了，这次算是对heroku的机制也有了一个简单的了解，之后找个机会嫖个每月450小时的运行时长吧（</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/myblog-wordpress/index.php/2022/02/06/hexo-heroku%e9%83%a8%e7%bd%b2%e8%ae%b0/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">58</post-id>	</item>
+		<item>
+		<title>pycharm终端无法使用python命令的一个可能解决方案</title>
+		<link>/myblog-wordpress/index.php/2022/02/01/pycharm%e7%bb%88%e7%ab%af%e6%97%a0%e6%b3%95%e4%bd%bf%e7%94%a8python%e5%91%bd%e4%bb%a4%e7%9a%84%e4%b8%80%e4%b8%aa%e5%8f%af%e8%83%bd%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88/</link>
+					<comments>/myblog-wordpress/index.php/2022/02/01/pycharm%e7%bb%88%e7%ab%af%e6%97%a0%e6%b3%95%e4%bd%bf%e7%94%a8python%e5%91%bd%e4%bb%a4%e7%9a%84%e4%b8%80%e4%b8%aa%e5%8f%af%e8%83%bd%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88/#respond</comments>
+		
+		<dc:creator><![CDATA[文诗就是本子]]></dc:creator>
+		<pubDate>Tue, 01 Feb 2022 10:22:42 +0000</pubDate>
+				<category><![CDATA[开发/服务器踩坑记录]]></category>
+		<guid isPermaLink="false">/myblog-wordpress/?p=26</guid>
+
+					<description><![CDATA[pycharm中无法识别python为命令，但cmd和powershell中都可以使用，这时使用管理员身份运行 [&#8230;]]]></description>
+										<content:encoded><![CDATA[
+<p>pycharm中无法识别python为命令，但cmd和powershell中都可以使用，这时使用管理员身份运行pycharm即可。</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/myblog-wordpress/index.php/2022/02/01/pycharm%e7%bb%88%e7%ab%af%e6%97%a0%e6%b3%95%e4%bd%bf%e7%94%a8python%e5%91%bd%e4%bb%a4%e7%9a%84%e4%b8%80%e4%b8%aa%e5%8f%af%e8%83%bd%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">26</post-id>	</item>
+		<item>
+		<title>pip安装依赖失败的一个可能原因</title>
+		<link>/myblog-wordpress/index.php/2022/02/01/pip%e5%ae%89%e8%a3%85%e4%be%9d%e8%b5%96%e5%a4%b1%e8%b4%a5%e7%9a%84%e4%b8%80%e4%b8%aa%e5%8f%af%e8%83%bd%e5%8e%9f%e5%9b%a0/</link>
+					<comments>/myblog-wordpress/index.php/2022/02/01/pip%e5%ae%89%e8%a3%85%e4%be%9d%e8%b5%96%e5%a4%b1%e8%b4%a5%e7%9a%84%e4%b8%80%e4%b8%aa%e5%8f%af%e8%83%bd%e5%8e%9f%e5%9b%a0/#respond</comments>
+		
+		<dc:creator><![CDATA[文诗就是本子]]></dc:creator>
+		<pubDate>Tue, 01 Feb 2022 08:55:08 +0000</pubDate>
+				<category><![CDATA[开发/服务器踩坑记录]]></category>
+		<guid isPermaLink="false">/myblog-wordpress/?p=17</guid>
+
+					<description><![CDATA[今天在使用弹幕自动切片工具的时候安装依赖的过程报错，错误日志已经不可考，我在网上找到了类似的报错日志以供参考。 [&#8230;]]]></description>
+										<content:encoded><![CDATA[
+<p>今天在使用弹幕自动切片工具的时候安装依赖的过程报错，错误日志已经不可考，我在网上找到了类似的报错日志以供参考。</p>
+
+
+
+<p>在出现如下报错日志的时候，可以用</p>
+
+
+
+<pre class="wp-block-code"><code>pip --version</code></pre>
+
+
+
+<p>来检查pip的版本，如果pip的版本没有问题，可以试图关闭vpn来解决，<s>我把代理关闭后马上不报错了。</s></p>
+
+
+
+<pre class="wp-block-code"><code>Installing packages failed: Installing packages: error occurred. Details…
+ERROR: Exception:
+Traceback (most recent call last):
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\cli\base_command.py", line 173, in _main
+    status = self.run(options, args)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\cli\req_command.py", line 203, in wrapper
+    return func(self, options, args)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\commands\install.py", line 316, in run
+    reqs, check_supported_wheels=not options.target_dir
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\resolution\resolvelib\resolver.py", line 95, in resolve
+    collected.requirements, max_rounds=try_to_avoid_resolution_too_deep
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\resolvelib\resolvers.py", line 472, in resolve
+    state = resolution.resolve(requirements, max_rounds=max_rounds)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\resolvelib\resolvers.py", line 341, in resolve
+    self._add_to_criteria(self.state.criteria, r, parent=None)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\resolvelib\resolvers.py", line 172, in _add_to_criteria
+    if not criterion.candidates:
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\resolvelib\structs.py", line 151, in __bool__
+    return bool(self._sequence)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\resolution\resolvelib\found_candidates.py", line 140, in __bool__
+    return any(self)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\resolution\resolvelib\found_candidates.py", line 128, in &lt;genexpr&gt;
+    return (c for c in iterator if id(c) not in self._incompatible_ids)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\resolution\resolvelib\found_candidates.py", line 29, in _iter_built
+    for version, func in infos:
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\resolution\resolvelib\factory.py", line 275, in iter_index_candidate_infos
+    hashes=hashes,
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\package_finder.py", line 851, in find_best_candidate
+    candidates = self.find_all_candidates(project_name)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\package_finder.py", line 798, in find_all_candidates
+    page_candidates = list(page_candidates_it)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\sources.py", line 134, in page_candidates
+    yield from self._candidates_from_page(self._link)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\package_finder.py", line 758, in process_project_url
+    html_page = self._link_collector.fetch_page(project_url)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\collector.py", line 490, in fetch_page
+    return _get_html_page(location, session=self.session)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\collector.py", line 400, in _get_html_page
+    resp = _get_html_response(url, session=session)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\index\collector.py", line 132, in _get_html_response
+    "Cache-Control": "max-age=0",
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\requests\sessions.py", line 555, in get
+    return self.request('GET', url, **kwargs)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_internal\network\session.py", line 454, in request
+    return super().request(method, url, *args, **kwargs)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\requests\sessions.py", line 542, in request
+    resp = self.send(prep, **send_kwargs)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\requests\sessions.py", line 655, in send
+    r = adapter.send(request, **kwargs)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\cachecontrol\adapter.py", line 53, in send
+    resp = super(CacheControlAdapter, self).send(request, **kw)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\requests\adapters.py", line 449, in send
+    timeout=timeout
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\urllib3\connectionpool.py", line 696, in urlopen
+    self._prepare_proxy(conn)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\urllib3\connectionpool.py", line 964, in _prepare_proxy
+    conn.connect()
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\urllib3\connection.py", line 359, in connect
+    conn = self._connect_tls_proxy(hostname, conn)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\urllib3\connection.py", line 506, in _connect_tls_proxy
+    ssl_context=ssl_context,
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\urllib3\util\ssl_.py", line 453, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls)
+  File "d:\bigdataapps\python\lib\site-packages\pip\_vendor\urllib3\util\ssl_.py", line 495, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock)
+  File "d:\bigdataapps\python\lib\ssl.py", line 407, in wrap_socket
+    _context=self, _session=session)
+  File "d:\bigdataapps\python\lib\ssl.py", line 773, in __init__
+    raise ValueError("check_hostname requires server_hostname")
+ValueError: check_hostname requires server_hostname
+</code></pre>
+
+
+
+<p></p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/myblog-wordpress/index.php/2022/02/01/pip%e5%ae%89%e8%a3%85%e4%be%9d%e8%b5%96%e5%a4%b1%e8%b4%a5%e7%9a%84%e4%b8%80%e4%b8%aa%e5%8f%af%e8%83%bd%e5%8e%9f%e5%9b%a0/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">17</post-id>	</item>
+	</channel>
+</rss>
